@@ -5,10 +5,15 @@ const scoreText = document.getElementById("score");
 const timeText = document.getElementById("time");
 
 const startBtn = document.getElementById("startBtn");
+
+const bestScoreText = document.getElementById("bestScore");
+
 let score = 0;
 
 let timeLeft = 30;
+
 let gameInterval;
+
 function moveTarget() {
 
   const gameArea = document.getElementById("gameArea");
@@ -25,12 +30,18 @@ function moveTarget() {
 
   target.style.top = `${randomY}px`;
 }
+
+bestScoreText.innerText =
+  localStorage.getItem("bestScore") || 0;
+
 startBtn.addEventListener("click", () => {
 
   score = 0;
+
   timeLeft = 30;
 
   scoreText.innerText = score;
+
   timeText.innerText = timeLeft;
 
   target.style.display = "block";
@@ -53,41 +64,54 @@ startBtn.addEventListener("click", () => {
 
       const playerName = prompt("Enter your name");
 
-fetch("http://127.0.0.1:3000/save-score", {
+      fetch("http://127.0.0.1:3000/save-score", {
 
-  method: "POST",
+        method: "POST",
 
-  headers: {
-    "Content-Type": "application/json"
-  },
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-  body: JSON.stringify({
-    name: playerName,
-    score: score
-  })
+        body: JSON.stringify({
+          name: playerName,
+          score: score
+        })
 
-})
-.then((res) => res.json())
-.then((data) => {
+      })
+      .then((res) => res.json())
+      .then((data) => {
 
-  alert("Score Saved!");
+        alert("Score Saved!");
 
-});
+      });
 
     }
 
   }, 1000);
 
 });
+
 target.addEventListener("click", () => {
 
   score++;
 
   scoreText.innerText = score;
 
+  const bestScore =
+    localStorage.getItem("bestScore") || 0;
+
+  if (score > bestScore) {
+
+    localStorage.setItem("bestScore", score);
+
+    bestScoreText.innerText = score;
+
+  }
+
   moveTarget();
 
 });
+
 function loadLeaderboard() {
 
   fetch("http://127.0.0.1:3000/leaderboard")
@@ -115,4 +139,5 @@ function loadLeaderboard() {
     });
 
 }
+
 loadLeaderboard();
